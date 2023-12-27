@@ -1,0 +1,14 @@
+- name: learning lopps to install multiple packages in ansible
+  hosts: localhost
+  become: yes # giving root acess
+  tasks:
+    - name: Installing Git & nginx and uninstalling Postfix & mysql
+      ansible.builtin.package:
+        name: "{{item.name}}" # item is default keyword for loop
+        state: "{{item.state}}" # present mean install, absent mean uninstall 
+        
+      loop:
+      - {name: 'git', state: 'present'}
+      - {name: 'postfix', state: 'absent'}
+      - {name: 'mysql', state: 'absent'}
+      - {name: 'nginx', state: 'present'}

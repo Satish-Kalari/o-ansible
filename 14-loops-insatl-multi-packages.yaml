@@ -1,0 +1,12 @@
+- name: learning lopps to install multiple packages in ansible
+  hosts: localhost
+  become: yes # giving root acess
+  tasks:
+    - name: Installing Git, Postfix & mysql
+      ansible.builtin.package:
+        name: "{{item}}" # item is default keyword for loop
+        state: present # present mean install
+      loop:
+      - git
+      - postfix
+      - mysql

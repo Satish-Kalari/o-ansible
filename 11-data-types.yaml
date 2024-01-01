@@ -2,12 +2,12 @@
   hosts: localhost
   vars:
     NAME: SatishKumat #key values
-    Skills: # Skill is type: List
+    Skills: # Skill is type= List
     - DevOps
     - Ansible
     - Lunix
     - Shell
-    Experince: # Experince is type: Map, it cotains key:value pairs
+    Experince: # Experince is type= Map, it cotains key:value pairs
       DevOps: 1
       AWS: 1
       Docker: 1

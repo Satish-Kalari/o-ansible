@@ -1,0 +1,56 @@
+---
+- hosts: all
+  become: yes
+  vars:
+   postgres_password: "sarvag123"
+  tasks:
+   - name: Update the system
+     command: dnf update
+     register: update_result
+     changed_when: update_result.rc == 0
+
+   - name: Install PostgreSQL
+     command: dnf install -y postgresql15.x86_64 postgresql15-server
+     register: install_result
+     changed_when: install_result.rc == 0
+
+   - name: Initialize the database
+     command: postgresql-setup --initdb
+     register: initdb_result
+     changed_when: initdb_result.rc == 0
+
+   - name: Start the PostgreSQL service
+     command: systemctl start postgresql
+     register: start_result
+     changed_when: start_result.rc == 0
+
+   - name: Enable the PostgreSQL service to start on boot
+     command: systemctl enable postgresql
+     register: enable_result
+     changed_when: enable_result.rc == 0
+
+   - name: Backup the postgresql.conf file
+     command: cp /var/lib/pgsql/data/postgresql.conf /var/lib/pgsql/data/postgresql.conf.bak
+     register: backup_result
+     changed_when: backup_result.rc == 0
+
+   - name: Modify the postgresql.conf file to accept connections from anywhere
+     command: sed -i 's/#listen_addresses = 'localhost'/listen_addresses = '\''\*'\''/' /var/lib/pgsql/data/postgresql.conf
+     register: modify_postgresql_result
+     changed_when: modify_postgresql_result.rc == 0
+
+   - name: Change the password of the postgres user
+     command: echo "{{ postgres_password }}" | passwd --stdin postgres
+     register: passwd_result
+     changed_when: passwd_result.rc == 0
+
+   - name: Modify the pg_hba.conf file to allow remote connections
+     command: sed -i 's/#host all all 127.0.0.1\/32 ident host all all 0.0.0.0\/0 md5/host all all 0.0.0.0\/0 md5/' /var/lib/pgsql/data/pg_hba.conf
+     register: modify_pg_hba_result
+     changed_when: modify_pg_hba_result.rc == 0
+
+   - name: Restart the PostgreSQL service
+     command: systemctl restart postgresql
+     register: restart_result
+     changed_when: restart_result.rc == 0
+...
